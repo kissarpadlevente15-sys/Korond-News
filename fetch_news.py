@@ -1,41 +1,47 @@
+import urllib.request
+import xml.etree.ElementTree as ET
+import json
+import urllib.parse
+from datetime import datetime
 
-        items.append(
-            {
-                "title": title,
-                "link": link,
-                "published": published.isoformat().replace("+00:00", "Z")
-                if published
-                else pub_date_raw,
-                "source": source or "Google News",
-                "_sort_date": published or datetime.min.replace(tzinfo=timezone.utc),
-            }
-        )
+FEEDS = [
+    "https://google.com" + urllib.parse.quote("Korond") + "&hl=hu&gl=RO&ceid=RO:hu",
+    "https://google.com" + urllib.parse.quote("Corund") + "&hl=ro&gl=RO&ceid=RO:ro"
+]
 
-    items.sort(key=lambda entry: entry["_sort_date"], reverse=True)
-    for item in items:
-        item.pop("_sort_date", None)
-    return items[:20]
+items = []
+seen_links = set()
 
-
-def main() -> int:
+for url in FEEDS:
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
     try:
-        news = fetch_items()
-        payload = {
-            "query": QUERY,
-            "updated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-            "count": len(news),
-            "articles": news,
-        }
-        OUTPUT_FILE.write_text(
-            json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
-            encoding="utf-8",
-        )
-        print(f"Saved {len(news)} articles to {OUTPUT_FILE}")
-        return 0
-    except (urllib.error.URLError, TimeoutError, ET.ParseError, ValueError) as exc:
-        print(f"Could not update news feed: {exc}", file=sys.stderr)
-        return 1
+        with urllib.request.urlopen(req, timeout=15) as response:
+            xml_data = response.read()
+        root = ET.fromstring(xml_data)
+        for item in root.findall("./channel/item"):
+            title = item.findtext("title", default="").strip()
+            link = item.findtext("link", default="").strip()
+            pub_date = item.findtext("pubDate", default="").strip()
+            source_el = item.find("source")
+            source = source_el.text.strip() if source_el is not None and source_el.text else "Google News"
 
+            if link and link not in seen_links:
+                seen_links.add(link)
+                items.append({
+                    "title": title,
+                    "link": link,
+                    "pubDate": pub_date,
+                    "source": source
+                })
+    except Exception as e:
+        print(f"Error fetching {url}: {e}")
 
-if __name__ == "__main__":
-    raise SystemExit(main())
+output = {
+    "updated_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
+    "articles": items[:25]
+}
+
+with open("news.json", "w", encoding="utf-8") as f:
+    json.dump(output, f, ensure_ascii=False, indent=2)
+
+print(f"Saved {len(output['articles'])} articles to news.json")
