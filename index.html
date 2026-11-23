@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="description" content="The latest news and headlines about Korond, gathered automatically.">
+  <title>Korond News — Latest headlines</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background: #f8fafc; }
+    .news-card { transition: transform .18s ease, box-shadow .18s ease; }
+    .news-card:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(15, 23, 42, .09); }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 antialiased">
+  <header class="bg-slate-900 text-white">
+    <div class="mx-auto max-w-5xl px-5 py-10 sm:py-14">
+      <div class="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-[.18em] text-teal-300">
+        <span class="h-2 w-2 rounded-full bg-teal-300"></span>
+        Local news digest
+      </div>
+      <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">Korond <span class="text-teal-300">News</span></h1>
+      <p class="mt-3 max-w-xl text-base leading-7 text-slate-300 sm:text-lg">
+        The latest headlines about Korond, collected in one place.
+      </p>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-5xl px-5 py-8 sm:py-10">
+    <div class="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+      <div>
+        <h2 class="text-2xl font-bold tracking-tight text-slate-900">Latest headlines</h2>
+        <p id="status" class="mt-1 text-sm text-slate-500" aria-live="polite">Loading news…</p>
+      </div>
+      <button id="refresh" type="button"
+        class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500">
+        Refresh
+      </button>
+    </div>
+
+    <div id="news-list" class="grid gap-4 md:grid-cols-2" aria-live="polite"></div>
+
+    <div id="empty-state" class="hidden rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center">
+      <p class="font-semibold text-slate-800">No headlines available right now</p>
+      <p class="mt-1 text-sm text-slate-500">Please try again later.</p>
+    </div>
+
+    <footer class="mt-12 border-t border-slate-200 py-6 text-xs leading-6 text-slate-500">
+      Headlines are provided by Google News RSS. Articles open on their original publishers’ websites.
+      <span id="updated" class="block"></span>
+    </footer>
+  </main>
+
+  <script>
+    const list = document.getElementById("news-list");
+    const status = document.getElementById("status");
+    const updated = document.getElementById("updated");
+    const emptyState = document.getElementById("empty-state");
+    const refreshButton = document.getElementById("refresh");
+
+    function formatDate(value) {
+      if (!value) return "Date unavailable";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+      return new Intl.DateTimeFormat(undefined, {
+        dateStyle: "medium", timeStyle: "short"
+      }).format(date);
+    }
+
+    function makeCard(article) {
+      const card = document.createElement("a");
+      card.className = "news-card group block rounded-2xl border border-slate-200 bg-white p-5 shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500";
+      card.href = article.link;
+      card.target = "_blank";
+      card.rel = "noopener noreferrer";
+
+      const meta = document.createElement("div");
+      meta.className = "mb-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-slate-500";
+
+      const source = document.createElement("span");
+      source.className = "rounded-full bg-teal-50 px-2.5 py-1 text-teal-800";
+      source.textContent = article.source || "Google News";
+
+      const date = document.createElement("span");
+      date.textContent = formatDate(article.published);
+      meta.append(source, date);
+
+      const title = document.createElement("h3");
+      title.className = "text-lg font-semibold leading-snug text-slate-900 group-hover:text-teal-700";
+      title.textContent = article.title || "Untitled article";
+
+      const readMore = document.createElement("div");
+      readMore.className = "mt-4 text-sm font-semibold text-teal-700";
+      readMore.textContent = "Read article ↗";
+
+      card.append(meta, title, readMore);
+      return card;
+    }
+
+    async function loadNews() {
+      refreshButton.disabled = true;
+      refreshButton.textContent = "Loading…";
+      status.textContent = "Fetching the latest headlines…";
+      list.replaceChildren();
+      emptyState.classList.add("hidden");
+
+      try {
+        // A cache-busting query helps visitors see the latest committed JSON.
+        const response = await fetch(`news.json?t=${Date.now()}`, { cache: "no-store" });
+        if (!response.ok) throw new Error(`Could not load news.json (${response.status})`);
+        const data = await response.json();
+        const articles = Array.isArray(data.articles) ? data.articles : [];
+
+        articles.forEach(article => list.appendChild(makeCard(article)));
+        status.textContent = `${articles.length} ${articles.length === 1 ? "article" : "articles"} found`;
+        if (articles.length === 0) emptyState.classList.remove("hidden");
+
+        updated.textContent = data.updated_at
+          ? `Feed last updated: ${formatDate(data.updated_at)}`
+          : "";
+      } catch (error) {
+        status.textContent = "News could not be loaded.";
+        emptyState.classList.remove("hidden");
+        console.error(error);
+      } finally {
+        refreshButton.disabled = false;
+        refreshButton.textContent = "Refresh";
+      }
+    }
+
+    refreshButton.addEventListener("click", loadNews);
+    loadNews();
+  </script>
+</body>
+</html>
