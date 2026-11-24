@@ -4,16 +4,15 @@ import json
 import urllib.parse
 from datetime import datetime
 
-# Direct RSS feeds from regional news sites + Google News fallback
 FEEDS = [
     {"url": "https://szekelyhon.ro", "filter": True},
     {"url": "https://maszol.ro", "filter": True},
     {"url": "https://transtelex.ro", "filter": True},
-    {"url": "https://google.com", "filter": False},
-    {"url": "https://google.com", "filter": False}
+    {"url": "https://google.com" + urllib.parse.quote("Korond OR Parajd OR Székelyudvarhely") + "&hl=hu&gl=HU&ceid=HU:hu", "filter": False},
+    {"url": "https://google.com" + urllib.parse.quote("Corund OR Praid OR Harghita") + "&hl=ro&gl=RO&ceid=RO:ro", "filter": False}
 ]
 
-KEYWORDS = ["korond", "corund", "sóvidék", "parajd", "praid", "atyha", "firtos", "pálpataka"]
+KEYWORDS = ["korond", "corund", "sóvidék", "parajd", "praid", "udvarhely", "harghita", "hargita", "székely"]
 
 items = []
 seen_links = set()
@@ -40,7 +39,6 @@ for feed in FEEDS:
             source_el = item.find("source")
             source = source_el.text.strip() if source_el is not None and source_el.text else channel_title
 
-            # If it's a general regional feed, check if it mentions Korond or nearby Sóvidék villages
             if feed["filter"]:
                 combined = (title + " " + desc).lower()
                 if not any(kw in combined for kw in KEYWORDS):
