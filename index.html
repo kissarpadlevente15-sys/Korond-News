@@ -6,225 +6,237 @@
   <title>Corund Chronicle · Korondi Krónika</title>
   <link rel="preconnect" href="https://googleapis.com" />
   <link rel="preconnect" href="https://gstatic.com" crossorigin />
-  <link href="https://googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Lora:ital,wght@0,500..700;1,500..700&display=swap" rel="stylesheet" />
-  <script src="https://tailwindcss.com"></script>
+  <link href="https://googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Lora:wght@600;700&display=swap" rel="stylesheet" />
   <style>
-    /* Transylvanian Terracotta & Alpine Pine — light surfaces */
     :root {
-      --background: #FAF7F2;
-      --foreground: #1C1917;
+      --bg: #FAF7F2;
+      --fg: #1C1917;
       --card: #FFFFFF;
-      --card-foreground: #1C1917;
       --primary: #B84A2A;
-      --primary-foreground: #FFFFFF;
-      --secondary: #F2ECE1;
-      --secondary-foreground: #1C1917;
+      --primary-fg: #FFFFFF;
       --muted: #F2ECE1;
-      --muted-foreground: #57534E;
+      --muted-fg: #57534E;
       --accent: #F9EDE8;
-      --accent-foreground: #8B3016;
+      --accent-fg: #8B3016;
       --border: #E5DCD0;
-      --pine: #2B533E;
+      --pine: #212B24;
       --gold: #F3C07B;
     }
-
-    /* Warm dark surfaces */
     .dark {
-      --background: #1C1917;
-      --foreground: #FAF7F2;
+      --bg: #1C1917;
+      --fg: #FAF7F2;
       --card: #262220;
-      --card-foreground: #FAF7F2;
       --primary: #E08A63;
-      --primary-foreground: #1C1917;
-      --secondary: #2E2A26;
-      --secondary-foreground: #FAF7F2;
+      --primary-fg: #1C1917;
       --muted: #2E2A26;
-      --muted-foreground: #D6D3D1;
+      --muted-fg: #D6D3D1;
       --accent: #33251E;
-      --accent-foreground: #F3C07B;
+      --accent-fg: #F3C07B;
       --border: #3B3631;
-      --pine: #6FA98C;
-      --gold: #F3C07B;
+      --pine: #18201B;
     }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background-color: var(--background);
-      color: var(--foreground);
-      font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
-      transition: background-color 0.2s ease, color 0.2s ease;
-    }
-
-    .font-heading {
-      font-family: 'Lora', Georgia, serif;
-    }
-
-    /* Corund Chronicle bespoke motion */
-    @keyframes ticker-scroll {
-      from { transform: translateX(0); }
-      to { transform: translateX(-50%); }
-    }
-    .ticker-track {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+      line-height: 1.5;
+      min-height: 100vh;
       display: flex;
-      width: max-content;
-      animation: ticker-scroll 60s linear infinite;
+      flex-direction: column;
     }
-    .ticker-viewport:hover .ticker-track {
-      animation-play-state: paused;
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; width: 100%; }
+    .heading { font-family: 'Lora', Georgia, serif; }
+
+    /* Header */
+    header {
+      position: sticky; top: 0; z-index: 30;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-logo {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: var(--primary); color: var(--primary-fg);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Lora', serif; font-weight: 700; font-size: 18px;
+    }
+    .brand-title { font-family: 'Lora', serif; font-weight: 700; font-size: 18px; display: block; line-height: 1.1; }
+    .brand-sub { font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted-fg); }
+    .nav-controls { display: flex; align-items: center; gap: 10px; }
+    .lang-group {
+      display: inline-flex; background: var(--card);
+      border: 1px solid var(--border); border-radius: 8px; padding: 2px;
+    }
+    .lang-btn {
+      padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;
+      color: var(--muted-fg);
+    }
+    .lang-btn.active { background: var(--primary); color: var(--primary-fg); }
+    .theme-btn {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: var(--card); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center; font-size: 14px;
     }
 
-    @keyframes live-pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.45; transform: scale(0.8); }
+    /* Breaking Ticker */
+    .ticker-bar {
+      display: flex; align-items: stretch;
+      background: #1C1917; color: #FAF7F2;
+      font-size: 13px; overflow: hidden;
+    }
+    .ticker-badge {
+      background: var(--primary); color: var(--primary-fg);
+      padding: 8px 16px; font-size: 11px; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      display: flex; align-items: center; gap: 8px; flex-shrink: 0;
     }
     .live-dot {
-      animation: live-pulse 1.6s ease-in-out infinite;
+      width: 8px; height: 8px; border-radius: 50%; background: currentColor;
+      animation: pulse 1.6s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+    .ticker-viewport { flex: 1; overflow: hidden; padding: 8px 0; display: flex; align-items: center; }
+    .ticker-track {
+      display: flex; width: max-content;
+      animation: scroll 55s linear infinite;
+    }
+    .ticker-viewport:hover .ticker-track { animation-play-state: paused; }
+    @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* Hero */
+    .hero { background: var(--pine); color: #F7F5F0; padding: 56px 0; }
+    .hero-grid {
+      display: grid; grid-template-columns: 1.4fr 1fr; gap: 40px; align-items: center;
+    }
+    .hero-kicker {
+      font-size: 12px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.22em; color: var(--gold);
+    }
+    .hero h1 {
+      font-family: 'Lora', serif; font-size: 40px; line-height: 1.18;
+      margin-top: 14px; font-weight: 700;
+    }
+    .hero-sub { color: #D1D9D3; margin-top: 16px; font-size: 16px; max-width: 540px; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+    .btn-primary {
+      background: var(--primary); color: var(--primary-fg);
+      padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-outline {
+      border: 1px solid rgba(255,255,255,0.3); color: #F7F5F0;
+      padding: 10px 18px; border-radius: 8px; font-size: 14px; font-weight: 500;
+    }
+    .btn-outline:hover { background: rgba(255,255,255,0.1); }
+
+    /* Weather Box */
+    .weather-card {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 16px; padding: 24px;
+    }
+    .weather-loc { font-size: 11px; text-transform: uppercase; letter-spacing: 0.16em; color: #D1D9D3; }
+    .weather-main { display: flex; align-items: baseline; gap: 12px; margin-top: 12px; }
+    .weather-temp { font-family: 'Lora', serif; font-size: 54px; font-weight: 700; line-height: 1; }
+    .weather-days { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 18px; }
+    .weather-day {
+      background: rgba(255,255,255,0.06); border-radius: 10px;
+      padding: 10px; text-align: center; font-size: 12px;
     }
 
+    /* Main Layout */
+    main { flex: 1; padding: 44px 0; }
+    .main-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 36px; align-items: start; }
+
+    /* Category Tabs */
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tab-btn {
+      padding: 7px 15px; border-radius: 999px; font-size: 13px; font-weight: 600;
+      background: var(--card); border: 1px solid var(--border); color: var(--fg);
+    }
+    .tab-btn.active { background: var(--primary); color: var(--primary-fg); border-color: var(--primary); }
+
+    .feed-meta {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border);
+      font-size: 12px; color: var(--muted-fg);
+    }
+
+    /* News Cards */
+    .articles-list { display: flex; flex-direction: column; gap: 18px; margin-top: 20px; }
     .news-card {
-      background-color: var(--card);
-      color: var(--card-foreground);
-      border: 1px solid var(--border);
-      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 22px;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
     }
     .news-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 28px -12px rgb(28 25 23 / 0.25);
+      box-shadow: 0 10px 24px -10px rgba(28, 25, 23, 0.2);
       border-color: var(--primary);
     }
-
-    .surface-card {
-      background-color: var(--card);
-      color: var(--card-foreground);
-      border: 1px solid var(--border);
+    .card-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; flex-wrap: wrap; }
+    .card-badges { display: flex; align-items: center; gap: 8px; }
+    .cat-pill {
+      background: var(--accent); color: var(--accent-fg);
+      padding: 3px 10px; border-radius: 999px; font-weight: 600; font-size: 11px;
     }
-  </style>
-</head>
-<body class="flex min-h-screen flex-col antialiased">
+    .source-name { font-weight: 600; }
+    .card-date { color: var(--muted-fg); }
+    .card-title {
+      font-family: 'Lora', serif; font-size: 19px; font-weight: 700;
+      line-height: 1.35; margin-top: 12px; display: block;
+    }
+    .news-card.featured .card-title { font-size: 23px; }
+    .card-title:hover { color: var(--primary); }
+    .card-summary { color: var(--muted-fg); font-size: 14px; margin-top: 10px; }
+    .card-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border);
+      font-size: 13px; font-weight: 600;
+    }
+    .read-link { color: var(--primary); }
+    .read-link:hover { text-decoration: underline; }
+    .save-btn {
+      padding: 4px 10px; border-radius: 6px; font-size: 12px; color: var(--muted-fg);
+    }
+    .save-btn.saved { background: var(--accent); color: var(--accent-fg); }
 
-  <!-- Top Header -->
-  <header class="sticky top-0 z-30 border-b backdrop-blur" style="background-color: color-mix(in oklab, var(--background) 92%, transparent); border-color: var(--border);">
-    <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6">
-      <a href="#" class="flex items-center gap-3">
-        <span class="flex size-9 items-center justify-center rounded-lg font-heading text-lg font-bold shadow-sm" style="background-color: var(--primary); color: var(--primary-foreground);">
-          C
-        </span>
-        <div>
-          <span class="block font-heading text-lg font-bold leading-none">Corund Chronicle</span>
-          <span class="mt-0.5 block text-[11px] font-medium uppercase tracking-widest" style="color: var(--muted-foreground);">Korond · Harghita</span>
-        </div>
-      </a>
+    /* Sidebar */
+    aside { display: flex; flex-direction: column; gap: 24px; }
+    .side-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 24px;
+    }
+    .side-kicker { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--primary); }
+    .side-title { font-family: 'Lora', serif; font-size: 20px; font-weight: 700; margin-top: 6px; }
+    .side-text { font-size: 14px; color: var(--muted-fg); margin-top: 10px; }
+    .facts-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+      margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);
+      font-size: 12px;
+    }
+    .fact-label { color: var(--muted-fg); display: block; }
+    .fact-val { font-weight: 600; }
+    .source-list { list-style: none; margin-top: 14px; }
+    .source-list li {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+    }
+    .source-list li:last-child { border-bottom: none; padding-bottom: 0; }
+    .rss-tag {
+      background: var(--accent); color: var(--accent-fg);
+      padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;
+    }
 
-      <div class="flex items-center gap-2.5">
-        <!-- Language Switcher -->
-        <div class="inline-flex rounded-lg border p-0.5 text-xs font-semibold" style="background-color: var(--card); border-color: var(--border);">
-          <button onclick="setLang('hu')" id="lang-hu" class="rounded-md px-2.5 py-1 transition">HU</button>
-          <button onclick="setLang('ro')" id="lang-ro" class="rounded-md px-2.5 py-1 transition">RO</button>
-          <button onclick="setLang('en')" id="lang-en" class="rounded-md px-2.5 py-1 transition">EN</button>
-        </div>
-
-        <!-- Dark / Light Mode Toggle -->
-        <button onclick="toggleTheme()" id="theme-btn" title="Téma váltása"
-          class="flex size-8 items-center justify-center rounded-lg border text-sm transition hover:opacity-80"
-          style="background-color: var(--card); border-color: var(--border);">
-          &#9790;
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Breaking Ticker -->
-  <div class="flex items-stretch bg-[#1C1917] text-[#FAF7F2]">
-    <div class="flex shrink-0 items-center gap-2 px-4 py-2 text-xs font-semibold uppercase tracking-widest" style="background-color: var(--primary); color: var(--primary-foreground);">
-      <span class="live-dot inline-block size-2 rounded-full bg-current"></span>
-      <span id="ui-ticker-live">ÉLŐ</span>
-    </div>
-    <div class="ticker-viewport relative flex-1 overflow-hidden py-2">
-      <div id="ticker-content" class="px-4 text-sm text-[#D6D3D1]">Hírek gyűjtése...</div>
-    </div>
-  </div>
-
-  <!-- Alpine Pine Hero -->
-  <section class="bg-[#212B24] text-[#F7F5F0]">
-    <div class="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-12 lg:py-20">
-      <div class="lg:col-span-7">
-        <p class="text-xs font-semibold uppercase tracking-[0.25em] text-[#F3C07B]">
-          Corund · Korond · Harghita megye
-        </p>
-        <h1 id="ui-hero-title" class="mt-4 font-heading text-4xl font-semibold leading-tight sm:text-5xl">
-          Korond és a Sóvidék friss hírei, egy helyen.
-        </h1>
-        <p id="ui-hero-sub" class="mt-5 max-w-xl text-[#D1D9D3]">
-          Automatikusan frissülő helyi hírgyűjtő a fazekasság fővárosából: kultúra, turizmus, önkormányzati hírek és közösségi események.
-        </p>
-        <div class="mt-8 flex flex-wrap gap-3">
-          <button onclick="document.getElementById('newsfeed').scrollIntoView({behavior:'smooth'})"
-            class="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold shadow-sm transition hover:opacity-90"
-            style="background-color: var(--primary); color: var(--primary-foreground);">
-            <span id="ui-read-latest">Legfrissebb hírek</span>
-            <span>&rarr;</span>
-          </button>
-          <button onclick="loadNews(true)"
-            class="inline-flex h-10 items-center rounded-lg border border-white/30 px-4 text-sm font-medium transition-colors hover:bg-white/10">
-            <span id="ui-refresh">Frissítés</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Weather Card -->
-      <div class="lg:col-span-5">
-        <div class="rounded-2xl border border-white/15 bg-white/10 p-6 backdrop-blur-sm">
-          <p class="flex items-center gap-2 text-xs uppercase tracking-widest text-[#D1D9D3]">
-            <span>&#128205;</span> Corund · 585 m
-          </p>
-          <div id="weather-box" class="mt-3">
-            <div class="h-32 animate-pulse rounded-lg bg-white/10"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Main Grid -->
-  <main id="newsfeed" class="mx-auto w-full max-w-7xl flex-1 px-4 py-12 sm:px-6">
-    <div class="grid gap-8 lg:grid-cols-12">
-
-      <!-- Feed Column -->
-      <div class="lg:col-span-8">
-        <div id="category-tabs" class="flex flex-wrap gap-2"></div>
-
-        <div class="mt-5 flex flex-wrap items-center justify-between gap-2 border-b pb-3 text-xs" style="border-color: var(--border); color: var(--muted-foreground);">
-          <span id="article-count">0 cikk</span>
-          <span id="last-updated">Frissítve: —</span>
-        </div>
-
-        <div id="articles-grid" class="mt-6 space-y-5"></div>
-      </div>
-
-      <!-- Sidebar -->
-      <aside class="space-y-6 lg:col-span-4">
-        <div class="surface-card rounded-2xl p-6 shadow-sm">
-          <p class="text-xs font-bold uppercase tracking-widest" style="color: var(--primary);">Helyi iránytű</p>
-          <h2 id="ui-about-title" class="mt-2 font-heading text-xl font-semibold">Korond (Corund)</h2>
-          <p id="ui-about-desc" class="mt-2 text-sm leading-relaxed" style="color: var(--muted-foreground);">
-            Hargita megye egyik legismertebb települése a Sóvidéken, amely évszázados fazekashagyományairól, aragonitbányájáról és borvízforrásairól híres.
-          </p>
-          <div class="mt-4 grid grid-cols-2 gap-3 border-t pt-4 text-xs" style="border-color: var(--border);">
-            <div>
-              <span class="block" style="color: var(--muted-foreground);">Megye / Județ</span>
-              <span class="font-semibold">Harghita / Hargita</span>
-            </div>
-            <div>
-              <span class="block" style="color: var(--muted-foreground);">Régió</span>
-              <span class="font-semibold">Sóvidék</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="surface-card rounded-2xl p-6 shadow-sm">
-          <h3 id="ui-sources-title" class="font-heading text-lg font-semibold">Figyelt hírforrások</h3>
-          <p id="ui-sources-sub" class="mt-1 text-xs" style="color: var(--muted-foreground);">Automatikus RSS figyelés 2 óránként</p>
-          <ul class="mt-4 space-y-2.5 text-sm">
-            <li class="flex items-center justify-between border-b pb-2" style="border-color: var(--border);">
-              <span>Google News (RO / HU / EN)</span>
-              <span class="rounded px-2 py-0.5 text-[11px] font-semibold" style="background-color: var(--accent); color: var(--accent-foreground);">RSS</span>
-            </li>
+    /* Footer */
+    footer {
+      background: #1C1917; color: #D6D3D1; padding: 32px 0; margin-top: 40px;
+      font-size: 13px;
+    }
