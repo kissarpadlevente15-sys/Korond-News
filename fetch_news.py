@@ -10,7 +10,7 @@ FEEDS = [
     {"name": "Informatia Harghitei", "url": "https://" + "informatiahr.ro/feed/", "filter": True}
 ]
 
-KEYWORDS = ["korond", "corund", "sóvidék", "parajd", "praid", "udvarhely", "harghita", "hargita", "atyha", "firtos"]
+KEYWORDS = ["korond", "corund"]
 
 items = []
 seen_links = set()
