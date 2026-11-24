@@ -121,10 +121,58 @@
         <div class="meta"><span id="count">0 cikk</span><span id="updated">Frissítve: —</span></div>
         <div id="grid" class="list"></div>
       </div>
-      <aside>
+            <aside>
         <div class="side">
           <span class="kicker" style="color:var(--primary);">Helyi iránytű</span>
           <h2 id="ui-about-t">Korond (Corund)</h2>
           <p id="ui-about-d">Hargita megye egyik legismertebb települése a Sóvidéken, amely évszázados fazekashagyományairól, aragonitbányájáról és borvízforrásairól híres.</p>
           <div class="facts">
             <div><span style="color:var(--muted-fg);display:block;">Megye / Județ</span><strong>Harghita / Hargita</strong></div>
+            <div><span style="color:var(--muted-fg);display:block;">Régió</span><strong>Sóvidék</strong></div>
+          </div>
+        </div>
+        <div class="side">
+          <h2 id="ui-src-t" style="margin-top:0;">Figyelt hírforrások</h2>
+          <p id="ui-src-s" style="font-size:12px;margin-top:4px;">Automatikus RSS figyelés 2 óránként</p>
+          <ul class="srcs">
+            <li><span>Google News (RO / HU / EN)</span><span class="pill" style="margin:0;">RSS</span></li>
+            <li><span>Bing News</span><span class="pill" style="margin:0;">RSS</span></li>
+            <li><span>MASZOL.ro</span><span class="pill" style="margin:0;">RSS</span></li>
+            <li><span>Uh.ro · Hargita Népe · Liget.ro</span><span class="pill" style="margin:0;">RSS</span></li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </main>
+  <footer>
+    <div class="container foot">
+      <strong style="font-family:'Lora',serif;color:#FAF7F2;">Corund Chronicle · Korondi Krónika</strong>
+      <span>Minden cikk az eredeti kiadó oldalán nyílik meg · Automatikusan frissítve.</span>
+    </div>
+  </footer>
+  <script>
+    const FEED_URL = "https://githubusercontent.com";
+    let articles = [], cat = "all", lang = localStorage.getItem("cc_lang") || "hu", saved = JSON.parse(localStorage.getItem("cc_saved") || "[]");
+    if (localStorage.getItem("cc_theme") === "dark") document.documentElement.classList.add("dark");
+    function toggleTheme() { document.documentElement.classList.toggle("dark"); localStorage.setItem("cc_theme", document.documentElement.classList.contains("dark") ? "dark" : "light"); document.getElementById("theme-btn").innerHTML = document.documentElement.classList.contains("dark") ? "&#9728;" : "&#9790;"; }
+    const T = {
+      hu: { live:"ÉLŐ", title:"Korond és a Sóvidék friss hírei, egy helyen.", sub:"Automatikusan frissülő helyi hírgyűjtő a fazekasság fővárosából: kultúra, turizmus, önkormányzati hírek és közösségi események.", read:"Legfrissebb hírek →", ref:"Frissítés", aboutT:"Korond (Corund)", aboutD:"Hargita megye egyik legismertebb települése a Sóvidéken, amely évszázados fazekashagyományairól, aragonitbányájáról és borvízforrásairól híres.", srcT:"Figyelt hírforrások", srcS:"Automatikus RSS figyelés 2 óránként", open:"Teljes cikk olvasása", save:"Mentés", saved:"Mentve", empty:"Nincs megjeleníthető cikk.", upd:"Utolsó frissítés:", cnt:"cikk", cats:{all:"Összes",culture:"Kultúra & Fazekasság",tourism:"Turizmus",municipal:"Önkormányzat",community:"Közösség",general:"Általános",saved:"Mentett"} },
+      ro: { live:"LIVE", title:"Știrile locale din Corund și Ținutul Sării, într-un singur loc.", sub:"Agregator local actualizat automat din capitala ceramicii: cultură, turism, administrație locală și comunitate.", read:"Ultimele știri →", ref:"Reîmprospătează", aboutT:"Corund (Korond)", aboutD:"Una dintre cele mai cunoscute comune din județul Harghita, renumită pentru olăritul tradițional, mina de aragonit și izvoarele de apă minerală.", srcT:"Surse monitorizate", srcS:"Actualizare automată RSS la fiecare 2 ore", open:"Citește articolul", save:"Salvează", saved:"Salvat", empty:"Nu există articole.", upd:"Actualizat:", cnt:"articole", cats:{all:"Toate",culture:"Cultură & Olărit",tourism:"Turism",municipal:"Administrație",community:"Comunitate",general:"General",saved:"Salvate"} },
+      en: { live:"LIVE", title:"Fresh news from Corund and the Salt Region, in one place.", sub:"Automatically updated local news aggregator from Romania’s pottery capital: culture, tourism, municipal updates, and community stories.", read:"Read latest →", ref:"Refresh", aboutT:"Corund (Corond)", aboutD:"A historic village in Harghita County, Transylvania, renowned for its centuries-old pottery craft, aragonite mine, and mineral springs.", srcT:"Monitored Sources", srcS:"Automatic RSS sync every 2 hours", open:"Read full story", save:"Save", saved:"Saved", empty:"No articles found.", upd:"Last synced:", cnt:"articles", cats:{all:"All",culture:"Culture & Craft",tourism:"Tourism",municipal:"Municipal",community:"Community",general:"General",saved:"Saved"} }
+    };
+    function setLang(l) { lang=l; localStorage.setItem("cc_lang",l); ["hu","ro","en"].forEach(x=>document.getElementById("lang-"+x).classList.toggle("active",x===l)); const t=T[l]; document.getElementById("ui-live").textContent=t.live; document.getElementById("ui-title").textContent=t.title; document.getElementById("ui-sub").textContent=t.sub; document.getElementById("ui-read").textContent=t.read; document.getElementById("ui-refresh").textContent=t.ref; document.getElementById("ui-about-t").textContent=t.aboutT; document.getElementById("ui-about-d").textContent=t.aboutD; document.getElementById("ui-src-t").textContent=t.srcT; document.getElementById("ui-src-s").textContent=t.srcS; renderTabs(); renderList(); }
+    function renderTabs() { const t=T[lang], keys=["all","culture","tourism","municipal","community","saved"]; document.getElementById("tabs").innerHTML=keys.map(k=>`<button onclick="cat='${k}';renderTabs();renderList();" class="tab ${cat===k?'active':''}">${t.cats[k]}${k==='saved'?' ('+saved.length+')':''}</button>`).join(""); }
+    function toggleSave(u) { saved=saved.includes(u)?saved.filter(x=>x!==u):[...saved,u]; localStorage.setItem("cc_saved",JSON.stringify(saved)); renderTabs(); renderList(); }
+    function esc(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+    function renderList() {
+      const t=T[lang]; let list=cat==="saved"?articles.filter(a=>saved.includes(a.link)):cat==="all"?articles:articles.filter(a=>(a.category||"general")===cat);
+      document.getElementById("count").textContent=`${list.length} ${t.cnt}`; const g=document.getElementById("grid");
+      if(!list.length){g.innerHTML=`<div class="side" style="text-align:center;">${t.empty}</div>`;return;}
+      g.innerHTML=list.map(a=>{const c=a.category||"general",isS=saved.includes(a.link);return `<article class="card"><div class="card-top"><div><span class="pill">${t.cats[c]||t.cats.general}</span><strong>${esc(a.source)}</strong></div><span style="color:var(--muted-fg);">${esc(a.pubDate||a.date||"")}</span></div><a href="${a.link}" target="_blank" rel="noopener" class="card-title">${esc(a.title)}</a>${a.summary?`<p class="card-sum">${esc(a.summary)}</p>`:""}<div class="card-foot"><a href="${a.link}" target="_blank" rel="noopener" class="read-btn">${t.open} &#8599;</a><button onclick="toggleSave('${a.link.replace(/'/g,"\\'")}')" class="save-btn ${isS?'saved':''}">${isS?'&#9733; '+t.saved:'&#9734; '+t.save}</button></div></article>`;}).join("");
+    }
+    async function loadNews() { try { const r=await fetch(FEED_URL+"?t="+Date.now()), d=await r.json(); articles=d.articles||[]; document.getElementById("updated").textContent=`${T[lang].upd} ${d.updated_at||"—"}`; const h=articles.slice(0,10).map(a=>esc(a.title)); if(h.length) document.getElementById("ticker-box").innerHTML=`<div class="ticker-track">${[...h,...h].map(x=>`<span style="white-space:nowrap;">${x}</span>`).join('<span style="margin:0 22px;color:#F3C07B;">&bull;</span>')}</div>`; renderList(); } catch(e){} }
+    async function loadWeather() { try { const r=await fetch("https://open-meteo.com"), w=await r.json(); const days=w.daily.time.map((dt,i)=>`<div class="w-day"><strong style="display:block;text-transform:uppercase;">${new Date(dt).toLocaleDateString(lang==="hu"?"hu-HU":lang==="ro"?"ro-RO":"en-GB",{weekday:"short"})}</strong><span>${Math.round(w.daily.temperature_2m_max[i])}&deg; / ${Math.round(w.daily.temperature_2m_min[i])}&deg;</span></div>`).join(""); document.getElementById("weather-box").innerHTML=`<div class="w-main"><span class="w-temp">${Math.round(w.current.temperature_2m)}&deg;</span><span style="font-size:14px;color:#D1D9D3;">Corund · Harghita</span></div><div class="w-days">${days}</div>`; } catch(e){} }
+    setLang(lang); loadNews(); loadWeather();
+  </script>
+</body>
+</html>
